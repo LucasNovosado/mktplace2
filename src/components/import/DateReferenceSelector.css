@@ -1,0 +1,72 @@
+/* src/components/import/DateReferenceSelector.css */
+.date-reference-container {
+  background-color: var(--card-background);
+  border-radius: 8px;
+  padding: 1rem;
+  border: 1px solid var(--border-color);
+  margin-bottom: 1.5rem;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+}
+
+.date-selector {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 0.75rem;
+}
+
+.date-selector label {
+  font-weight: 600;
+  color: var(--primary-color);
+  min-width: 140px;
+}
+
+.date-input {
+  padding: 0.5rem;
+  border: 1px solid var(--input-border);
+  border-radius: 4px;
+  background-color: var(--card-background);
+  color: var(--text-color);
+  transition: border-color 0.3s, box-shadow 0.3s;
+  font-size: 1rem;
+}
+
+.date-input:focus {
+  outline: none;
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 2px rgba(255, 215, 0, 0.2);
+}
+
+.date-input:disabled {
+  background-color: rgba(255, 255, 255, 0.05);
+  cursor: not-allowed;
+}
+
+.date-info {
+  font-size: 0.9rem;
+  color: var(--text-muted);
+  padding: 0.25rem 0;
+  border-top: 1px solid var(--border-color);
+  padding-top: 0.75rem;
+}
+
+.date-info strong {
+  color: var(--text-color);
+}
+
+/* Responsividade */
+@media screen and (max-width: 768px) {
+  .date-selector {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+  
+  .date-selector label {
+    min-width: unset;
+  }
+  
+  .date-input {
+    width: 100%;
+  }
+}

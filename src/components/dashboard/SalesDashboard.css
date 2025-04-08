@@ -1,0 +1,309 @@
+/* src/components/dashboard/SalesDashboard.css */
+
+/* Estrutura principal */
+.sales-dashboard {
+  background-color: var(--background-color);
+  min-height: 100vh;
+  padding: 1.5rem;
+}
+
+/* Cabeçalho */
+.dashboard-header {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+  padding-bottom: 1.5rem;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.dashboard-title {
+  display: flex;
+  align-items: center;
+  font-size: 1.5rem;
+  color: var(--primary-color);
+  margin: 0;
+  gap: 0.5rem;
+}
+
+.dashboard-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  width: 100%;
+}
+
+.filter-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.filter-label {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--text-color);
+}
+
+.filter-input,
+.filter-select {
+  padding: 0.5rem;
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  min-width: 150px;
+  background-color: var(--card-background);
+  color: var(--text-color);
+}
+
+.filter-button {
+  padding: 0.5rem 1rem;
+  background-color: var(--primary-color);
+  color: #000; /* Texto escuro sobre fundo amarelo para legibilidade */
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: background-color 0.3s;
+}
+
+.filter-button:hover {
+  background-color: var(--hover-primary);
+}
+
+/* Tabs */
+.dashboard-tabs {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 2rem;
+  overflow-x: auto;
+  padding-bottom: 0.5rem;
+}
+
+.dashboard-tab {
+  padding: 0.75rem 1.25rem;
+  background-color: transparent;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: 500;
+  color: var(--text-muted);
+  transition: background-color 0.3s, color 0.3s;
+}
+
+.dashboard-tab:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+  color: var(--text-color);
+}
+
+.dashboard-tab.active {
+  background-color: var(--primary-color);
+  color: #000; /* Texto escuro para legibilidade */
+}
+
+/* Conteúdo */
+.tab-content {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+/* Cards de visão geral */
+.overview-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 1rem;
+}
+
+.overview-card {
+  background-color: var(--card-background);
+  border-radius: 8px;
+  padding: 1.5rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+  display: flex;
+  flex-direction: column;
+}
+
+.overview-card-header {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.overview-card-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.overview-card-icon.leads {
+  background-color: rgba(255, 215, 0, 0.2);
+  color: var(--primary-color);
+}
+
+.overview-card-icon.vendas {
+  background-color: rgba(30, 136, 229, 0.2);
+  color: var(--secondary-color);
+}
+
+.overview-card-icon.bats {
+  background-color: rgba(255, 215, 0, 0.2);
+  color: var(--primary-color);
+}
+
+.overview-card-icon.conversao {
+  background-color: rgba(30, 136, 229, 0.2);
+  color: var(--secondary-color);
+}
+
+.overview-card-title {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--text-muted);
+  margin: 0;
+}
+
+.overview-card-value {
+  font-size: 1.75rem;
+  font-weight: 600;
+  color: var(--text-color);
+  margin: 0;
+}
+
+/* Containers de gráficos */
+.chart-container {
+  background-color: var(--card-background);
+  border-radius: 8px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+  padding: 1.5rem;
+  height: 400px;
+  margin-bottom: 1rem;
+  border: 1px solid var(--border-color);
+}
+
+.chart-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+}
+
+.chart-title {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: var(--primary-color);
+  margin: 0;
+}
+
+/* Tabelas */
+.data-table-wrapper {
+  background-color: var(--card-background);
+  border-radius: 8px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+  padding: 1.5rem;
+  overflow-x: auto;
+  margin-bottom: 1rem;
+  border: 1px solid var(--border-color);
+}
+
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.data-table th,
+.data-table td {
+  padding: 0.75rem;
+  text-align: left;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.data-table th {
+  font-weight: 600;
+  color: var(--primary-color);
+  background-color: rgba(255, 215, 0, 0.05);
+}
+
+.data-table tr:hover {
+  background-color: rgba(255, 255, 255, 0.05);
+}
+
+/* Estados de carregamento, erro e sem dados */
+.dashboard-loading,
+.error-message,
+.no-data {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 300px;
+  background-color: var(--card-background);
+  border-radius: 8px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+  padding: 2rem;
+  text-align: center;
+}
+
+.dashboard-loading div,
+.no-data {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+}
+
+.dashboard-loading svg {
+  animation: spin 1.5s linear infinite;
+  color: var(--primary-color);
+}
+
+.error-message {
+  color: #ff8a8a;
+  background-color: rgba(211, 47, 47, 0.1);
+  border-left: 4px solid #ff8a8a;
+}
+
+.no-data {
+  color: var(--text-muted);
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Responsividade */
+@media (min-width: 768px) {
+  .dashboard-header {
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+  }
+  
+  .dashboard-filters {
+    width: auto;
+  }
+}
+
+@media (max-width: 768px) {
+  .sales-dashboard {
+    padding: 1rem;
+  }
+  
+  .overview-cards {
+    grid-template-columns: 1fr;
+  }
+  
+  .chart-container {
+    height: 350px;
+  }
+  
+  .dashboard-tab {
+    padding: 0.5rem 1rem;
+    font-size: 0.875rem;
+  }
+}

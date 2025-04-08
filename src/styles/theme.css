@@ -1,0 +1,99 @@
+/* src/styles/theme.css */
+:root {
+  /* Cores para o tema claro (mantemos para a funcionalidade de alternância) */
+  --background-color: #f5f5f5;
+  --card-background: #ffffff;
+  --text-color: #333333;
+  --primary-color: #4a90e2;
+  --hover-primary: #3a7bc8;
+  --secondary-color: #6c757d;
+  --hover-secondary: #5a6268;
+  --border-color: #e0e0e0;
+  --input-border: #ddd;
+  --input-focus: #4a90e2;
+  --error-background: #ffe6e6;
+  --error-color: #d32f2f;
+  --box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  --header-background: #ffffff;
+  --header-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* Tema escuro com amarelo e azul */
+[data-theme='dark'] {
+  /* Cores de fundo */
+  --background-color: #121212;
+  --card-background: #1e1e1e;
+  --header-background: #0f0f0f;
+  
+  /* Cores de texto */
+  --text-color: #f0f0f0;
+  --text-muted: #a0a0a0;
+  
+  /* Cores primárias - Amarelo */
+  --primary-color: #ffd700; /* Amarelo ouro */
+  --hover-primary: #ffea00; /* Amarelo brilhante */
+  
+  /* Cores secundárias - Azul */
+  --secondary-color: #1e88e5; /* Azul médio */
+  --hover-secondary: #42a5f5; /* Azul claro */
+  
+  /* Outros elementos */
+  --border-color: #333333;
+  --input-border: #444444;
+  --input-focus: #ffd700; /* Amarelo ouro */
+  --error-background: #4e2c2c;
+  --error-color: #ff8a8a;
+  --box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+  --header-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+  
+  /* Cores para os gráficos */
+  --chart-color-1: #ffd700; /* Amarelo */
+  --chart-color-2: #1e88e5; /* Azul */
+  --chart-color-3: #f06292; /* Rosa/Púrpura */
+  --chart-color-4: #4caf50; /* Verde */
+}
+
+/* Transições suaves */
+* {
+  transition: 
+    background-color 0.3s ease, 
+    color 0.3s ease, 
+    border-color 0.3s ease, 
+    box-shadow 0.3s ease;
+}
+
+body {
+  background-color: var(--background-color);
+  color: var(--text-color);
+}
+
+/* Estilo para o botão de alternar tema */
+.theme-toggle-button {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background-color: var(--primary-color);
+  color: #000000; /* Texto escuro no botão amarelo para contraste */
+  border: none;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  cursor: pointer;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  transition: transform 0.2s ease, background-color 0.3s ease;
+}
+
+.theme-toggle-button:hover {
+  background-color: var(--hover-primary);
+  transform: scale(1.1);
+}
+
+.theme-toggle-button svg {
+  width: 24px;
+  height: 24px;
+  stroke: currentColor;
+}

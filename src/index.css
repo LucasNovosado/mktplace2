@@ -1,0 +1,128 @@
+/* src/index.css */
+:root {
+  /* Cores principais */
+  --primary-color: #ffd700; /* Amarelo ouro */
+  --hover-primary: #ffea00; /* Amarelo brilhante */
+  --secondary-color: #1e88e5; /* Azul médio */
+  --hover-secondary: #42a5f5; /* Azul claro */
+  
+  /* Backgrounds */
+  --background-color: #121212;
+  --card-background: #1e1e1e;
+  --header-background: #0f0f0f;
+  
+  /* Texto */
+  --text-color: #f0f0f0;
+  --text-muted: #a0a0a0;
+  
+  /* Bordas */
+  --border-color: #333333;
+  --input-border: #444444;
+  --input-focus: #ffd700; /* Amarelo ouro */
+  
+  /* Sombras */
+  --box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+  --header-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+  --hover-shadow: 0 10px 15px rgba(0, 0, 0, 0.4);
+  
+  /* Alertas */
+  --error-color: #ff8a8a;
+  --error-background: #4e2c2c;
+  --success-color: #81c784;
+  --success-background: #1b5e20;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  line-height: 1.6;
+  color: var(--text-color);
+  background-color: var(--background-color);
+}
+
+a {
+  text-decoration: none;
+  color: var(--secondary-color);
+  transition: color 0.3s ease;
+}
+
+a:hover {
+  color: var(--hover-secondary);
+}
+
+button {
+  font-family: inherit;
+  cursor: pointer;
+}
+
+input, select, textarea, button {
+  font-family: inherit;
+  font-size: 1rem;
+  background-color: var(--card-background);
+  color: var(--text-color);
+  border: 1px solid var(--border-color);
+}
+
+input:focus, select:focus, textarea:focus {
+  border-color: var(--input-focus);
+  outline: none;
+}
+
+/* Estilos de utilidade */
+.text-center {
+  text-align: center;
+}
+
+.mb-1 {
+  margin-bottom: 0.5rem;
+}
+
+.mb-2 {
+  margin-bottom: 1rem;
+}
+
+.mb-3 {
+  margin-bottom: 1.5rem;
+}
+
+.mt-1 {
+  margin-top: 0.5rem;
+}
+
+.mt-2 {
+  margin-top: 1rem;
+}
+
+.mt-3 {
+  margin-top: 1.5rem;
+}
+
+/* Estilos de animação global */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideInUp {
+  from {
+    transform: translateY(30px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.fade-in {
+  animation: fadeIn 0.5s ease-out;
+}
+
+.slide-in {
+  animation: slideInUp 0.5s ease-out;
+}

@@ -1,0 +1,135 @@
+/* src/components/StyledCard.css */
+.styled-card {
+  background-color: var(--card-background);
+  border-radius: 12px;
+  box-shadow: var(--box-shadow);
+  overflow: hidden;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  isolation: isolate;
+  min-height: 240px;
+  padding: 1.5rem;
+  border: 1px solid var(--border-color);
+}
+
+.styled-card:hover {
+  transform: translateY(-5px);
+  box-shadow: var(--hover-shadow);
+}
+
+.styled-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 4px;
+  height: 100%;
+  background: var(--primary-color);
+  z-index: 1;
+}
+
+.styled-card-header {
+  display: flex;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.styled-card-icon {
+  font-size: 1.5rem;
+  margin-right: 0.75rem;
+  color: var(--primary-color);
+}
+
+.styled-card-title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--primary-color);
+  margin: 0;
+}
+
+.styled-card-content {
+  flex: 1;
+  margin-bottom: 1.5rem;
+}
+
+.styled-card-description {
+  color: var(--text-color);
+  opacity: 0.85;
+  line-height: 1.6;
+  margin-bottom: 1rem;
+}
+
+.styled-card-footer {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: auto;
+}
+
+.styled-card-button {
+  background-color: var(--primary-color);
+  color: #000; /* Texto escuro para contraste com amarelo */
+  border: none;
+  border-radius: 6px;
+  padding: 0.6rem 1.2rem;
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s, transform 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.styled-card-button:hover {
+  background-color: var(--hover-primary);
+  transform: translateX(5px);
+}
+
+.styled-card-button:focus {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(255, 215, 0, 0.3);
+}
+
+.arrow-icon {
+  width: 16px;
+  height: 16px;
+  transition: transform 0.2s ease;
+}
+
+.styled-card-button:hover .arrow-icon {
+  transform: translateX(4px);
+}
+
+/* Animação de entrada */
+@keyframes cardFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.styled-card {
+  animation: cardFadeIn 0.5s ease-out forwards;
+}
+
+/* Responsividade */
+@media screen and (max-width: 768px) {
+  .styled-card {
+    min-height: 220px;
+    padding: 1.25rem;
+  }
+  
+  .styled-card-title {
+    font-size: 1.1rem;
+  }
+  
+  .styled-card-button {
+    padding: 0.5rem 1rem;
+  }
+}
