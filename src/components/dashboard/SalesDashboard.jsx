@@ -1,3 +1,4 @@
+// src/components/dashboard/SalesDashboard.jsx
 import React, { useState, useEffect } from 'react';
 import dashboardService from '../../services/dashboardService';
 import DashboardHeader from './DashboardHeader';
@@ -22,7 +23,8 @@ const SalesDashboard = () => {
   // Estado para os filtros de data
   const [dateRange, setDateRange] = useState(() => {
     const today = new Date();
-    const firstDay = new Date(today.getFullYear(), today.getMonth(), 2);
+    // Primeiro dia do mês atual
+    const firstDay = new Date(today.getFullYear(), today.getMonth(), 1);
     return {
       startDate: firstDay,
       endDate: today
@@ -34,40 +36,35 @@ const SalesDashboard = () => {
     loadDashboardData();
   }, [dateRange]);
   
+  // Função para garantir que as datas estejam no formato correto
+  const normalizeDate = (date) => {
+    // Se já for um objeto Date, retorna uma cópia
+    if (date instanceof Date) {
+      return new Date(date);
+    }
+    // Se for uma string, converte para Date
+    return new Date(date);
+  };
+  
   // Função para carregar dados com base nos filtros
   const loadDashboardData = async () => {
     setLoading(true);
     setError(null);
     
     try {
-      // Criar cópias novas das datas para não modificar o estado original
-      const startDate = new Date(dateRange.startDate);
-      // Ajustar para o início do dia
-      startDate.setHours(0, 0, 0, 0);
+      // Criar cópias e normalizar as datas
+      const startDate = normalizeDate(dateRange.startDate);
+      const endDate = normalizeDate(dateRange.endDate);
       
-      const endDate = new Date(dateRange.endDate);
-      // Ajustar para o final do dia seguinte para compensar as 15h
-      endDate.setDate(endDate.getDate() + 1);
-      endDate.setHours(23, 59, 59, 999);
-      
-      // Log para depuração
-      console.log('Buscando dados no período ajustado:', 
-        startDate.toLocaleString(), 'até', endDate.toLocaleString());
+      console.log('Carregando dashboard com período:', 
+        startDate.toLocaleDateString(), 'até', endDate.toLocaleDateString());
       
       // Buscar dados do dashboard
-      const data = await dashboardService.getDashboardData(
-        startDate,
-        endDate
-      );
-      
+      const data = await dashboardService.getDashboardData(startDate, endDate);
       setDashboardData(data);
       
       // Buscar dados de timeline
-      const timeline = await dashboardService.getDailyData(
-        startDate,
-        endDate
-      );
-      
+      const timeline = await dashboardService.getDailyData(startDate, endDate);
       setTimelineData(timeline);
       
     } catch (error) {
@@ -80,7 +77,14 @@ const SalesDashboard = () => {
   
   // Manipuladores para filtros
   const handleStartDateChange = (e) => {
-    const newStartDate = new Date(e.target.value);
+    const inputDate = e.target.value; // Formato YYYY-MM-DD
+    
+    // Converter para Date seguindo o padrão da timezone local
+    // Importante: adicionar T00:00:00 para garantir que a data é interpretada no fuso horário local
+    const newStartDate = new Date(`${inputDate}T00:00:00`);
+    
+    console.log(`Nova data inicial selecionada: ${inputDate} -> ${newStartDate.toLocaleDateString()}`);
+    
     setDateRange(prev => ({
       ...prev,
       startDate: newStartDate
@@ -88,7 +92,14 @@ const SalesDashboard = () => {
   };
   
   const handleEndDateChange = (e) => {
-    const newEndDate = new Date(e.target.value);
+    const inputDate = e.target.value; // Formato YYYY-MM-DD
+    
+    // Converter para Date seguindo o padrão da timezone local
+    // Adicionamos T23:59:59 para garantir que o dia completo seja considerado
+    const newEndDate = new Date(`${inputDate}T23:59:59`);
+    
+    console.log(`Nova data final selecionada: ${inputDate} -> ${newEndDate.toLocaleDateString()}`);
+    
     setDateRange(prev => ({
       ...prev,
       endDate: newEndDate
@@ -157,7 +168,13 @@ const SalesDashboard = () => {
   // Formatação de datas para inputs
   const formatDateForInput = (date) => {
     if (!date) return '';
-    return date.toISOString().split('T')[0];
+    
+    const normalizedDate = normalizeDate(date);
+    const year = normalizedDate.getFullYear();
+    const month = String(normalizedDate.getMonth() + 1).padStart(2, '0');
+    const day = String(normalizedDate.getDate()).padStart(2, '0');
+    
+    return `${year}-${month}-${day}`;
   };
   
   // Renderização condicional: Loading

@@ -2,28 +2,39 @@
 import Parse from 'parse/dist/parse.min.js';
 
 /**
- * Ajusta a data para o início do dia no fuso horário local
+ * Ajusta a data para o início do dia
  * @param {Date} date - Data a ser ajustada
  * @returns {Date} Data ajustada para o início do dia
  */
-const adjustToLocalStartOfDay = (date) => {
-  // Criar uma nova data para evitar modificar o objeto original
-  const localDate = new Date(date);
-  
-  // Definir horário para 00:00:00 no fuso horário UTC
-  localDate.setUTCHours(0, 0, 0, 0) ;
-  
-  return localDate;
+const adjustToStartOfDay = (date) => {
+  const newDate = new Date(date);
+  newDate.setHours(0, 0, 0, 0);
+  return newDate;
 };
 
-const adjustToLocalEndOfDay = (date) => {
-  // Criar uma nova data para evitar modificar o objeto original
-  const localDate = new Date(date);
-  
-  // Definir horário para 23:59:59.999 no fuso horário UTC
-  localDate.setUTCHours(23, 59, 59, 999);
-  
-  return localDate;
+/**
+ * Ajusta a data para o final do dia
+ * @param {Date} date - Data a ser ajustada
+ * @returns {Date} Data ajustada para o final do dia
+ */
+const adjustToEndOfDay = (date) => {
+  const newDate = new Date(date);
+  newDate.setHours(23, 59, 59, 999);
+  return newDate;
+};
+
+/**
+ * Verifica se duas datas representam o mesmo dia, independente do horário
+ * @param {Date} date1 - Primeira data
+ * @param {Date} date2 - Segunda data
+ * @returns {boolean} Verdadeiro se as datas representam o mesmo dia
+ */
+const isSameDay = (date1, date2) => {
+  return (
+    date1.getFullYear() === date2.getFullYear() &&
+    date1.getMonth() === date2.getMonth() &&
+    date1.getDate() === date2.getDate()
+  );
 };
 
 /**
@@ -38,22 +49,24 @@ const dashboardService = {
    */
   getDashboardData: async (startDate, endDate) => {
     try {
-      // Log para depuração
-      console.log('Dashboard service recebeu datas:', 
-        startDate.toLocaleString(), 'até', endDate.toLocaleString());
+      // Ajustar as datas para incluir o dia todo
+      const start = adjustToStartOfDay(startDate);
+      const end = adjustToEndOfDay(endDate);
       
-      // Usar as datas diretamente sem ajustes adicionais
+      console.log(`Buscando dados agregados no período: ${start.toLocaleDateString()} a ${end.toLocaleDateString()}`);
+      
+      // Buscar releases no período
       const Release = Parse.Object.extend("Releases");
       const query = new Parse.Query(Release);
       
-      query.greaterThanOrEqualTo("dateRelease", startDate);
-      query.lessThanOrEqualTo("dateRelease", endDate);
+      query.greaterThanOrEqualTo("dateRelease", start);
+      query.lessThanOrEqualTo("dateRelease", end);
       query.include("sellerId");
       query.include("channelId");
       query.limit(1000); // Ajustar conforme necessário
       
       const releases = await query.find();
-      console.log('Releases encontrados:', releases.length);
+      console.log(`Encontrados ${releases.length} releases.`);
       
       // Agrupar dados por vendedor
       const sellerData = {};
@@ -205,56 +218,118 @@ const dashboardService = {
    */
   getDailyData: async (startDate, endDate) => {
     try {
-      // Log para depuração
-      console.log('getDailyData recebeu datas:', 
-        startDate.toLocaleString(), 'até', endDate.toLocaleString());
+      // Ajustar as datas para incluir o dia todo
+      const start = adjustToStartOfDay(startDate);
+      const end = adjustToEndOfDay(endDate);
       
-      // Usar as datas diretamente sem ajustes adicionais
+      console.log(`Buscando dados de timeline no período: ${start.toLocaleDateString()} a ${end.toLocaleDateString()}`);
+      
+      // Buscar releases no período
       const Release = Parse.Object.extend("Releases");
       const query = new Parse.Query(Release);
       
-      query.greaterThanOrEqualTo("dateRelease", startDate);
-      query.lessThanOrEqualTo("dateRelease", endDate);
+      query.greaterThanOrEqualTo("dateRelease", start);
+      query.lessThanOrEqualTo("dateRelease", end);
       query.include("sellerId");
       query.include("channelId");
       query.limit(1000); // Ajustar conforme necessário
       
       const releases = await query.find();
-      console.log('Releases diários encontrados:', releases.length);
+      console.log(`Encontrados ${releases.length} releases para timeline.`);
       
-      // Mapa para armazenar dados diários - usamos a data no formato DD/MM/YYYY como chave
+      // Criar um array de datas para todos os dias do período
+      const dailyData = [];
       const dailyDataMap = {};
       
-      // Gerar datas para todos os dias do período
-      // Importante: subtrair 1 dia para compensar o ajuste feito na data final
-      const startDay = new Date(startDate);
-      const endDay = new Date(endDate);
-      endDay.setDate(endDay.getDate() - 1); // Compensar a adição feita no SalesDashboard
-      
-      const currentDate = new Date(startDay);
-      while (currentDate <= endDay) {
+      // Gerar entrada para cada dia do período (incluindo o dia final)
+      const currentDate = new Date(start);
+      while (currentDate <= end) {
+        const formattedDate = formatDateBR(currentDate);
         const dateKey = formatDateKey(currentDate);
-        dailyDataMap[dateKey] = {
+        
+        console.log(`Gerando entrada para: ${formattedDate} (${dateKey})`);
+        
+        const dayEntry = {
           date: new Date(currentDate),
+          dateFormatted: formattedDate,
+          dateKey: dateKey,
           leads: 0,
           vendas: 0,
           bats: 0,
           sellers: {}
         };
+        
+        dailyData.push(dayEntry);
+        dailyDataMap[dateKey] = dayEntry;
+        
+        // Avançar para o próximo dia
         currentDate.setDate(currentDate.getDate() + 1);
       }
       
-      // Processar os releases por dia
+      console.log(`Gerados ${dailyData.length} dias para o gráfico.`);
+      
+      // Processar os releases
       releases.forEach(release => {
         const releaseDate = release.get("dateRelease");
         const seller = release.get("sellerId");
         
         if (!releaseDate || !seller) return;
         
-        // Ajustar a data para o fuso horário local e usar sempre a data local
-        const localReleaseDate = new Date(releaseDate);
-        const dateKey = formatDateKey(localReleaseDate);
+        // Encontrar a entrada correspondente no array de dias
+        // Verificamos a data independente do horário
+        const releaseDateOnly = new Date(releaseDate);
         
+        // Verificar em qual dia do período este release se encaixa
+        const dateKey = formatDateKey(releaseDateOnly);
+        
+        // Se a data não está no mapa, pode ser por problemas de fuso horário
+        if (!dailyDataMap[dateKey]) {
+          console.log(`Data ignorada: ${dateKey} de ${releaseDate.toISOString()}`);
+          
+          // Verificar manualmente cada dia do período
+          for (const day of dailyData) {
+            if (isSameDay(day.date, releaseDateOnly)) {
+              // Encontramos o dia correto
+              const dayEntry = day;
+              
+              const sellerId = seller.id;
+              const sellerName = seller.get("seller");
+              
+              // Valores do release
+              const leads = release.get("leads") || 0;
+              const vendas = release.get("vendas") || 0;
+              const bats = release.get("bats") || 0;
+              
+              // Atualizar totais do dia
+              dayEntry.leads += leads;
+              dayEntry.vendas += vendas;
+              dayEntry.bats += bats;
+              
+              // Inicializar ou atualizar dados do vendedor para este dia
+              if (!dayEntry.sellers[sellerId]) {
+                dayEntry.sellers[sellerId] = {
+                  id: sellerId,
+                  name: sellerName,
+                  leads: 0,
+                  vendas: 0,
+                  bats: 0
+                };
+              }
+              
+              // Atualizar dados do vendedor para este dia
+              dayEntry.sellers[sellerId].leads += leads;
+              dayEntry.sellers[sellerId].vendas += vendas;
+              dayEntry.sellers[sellerId].bats += bats;
+              
+              console.log(`Release adicionado manualmente ao dia ${dayEntry.dateFormatted}`);
+              break;
+            }
+          }
+          
+          return;
+        }
+        
+        const dayEntry = dailyDataMap[dateKey];
         const sellerId = seller.id;
         const sellerName = seller.get("seller");
         
@@ -263,26 +338,14 @@ const dashboardService = {
         const vendas = release.get("vendas") || 0;
         const bats = release.get("bats") || 0;
         
-        // Se a data não está no mapa, pode ser por problemas de timezone
-        if (!dailyDataMap[dateKey]) {
-          console.log('Data não encontrada no mapa:', dateKey, 'para data:', releaseDate.toLocaleString());
-          dailyDataMap[dateKey] = {
-            date: new Date(localReleaseDate),
-            leads: 0,
-            vendas: 0,
-            bats: 0,
-            sellers: {}
-          };
-        }
-        
-        // Atualizar totais diários
-        dailyDataMap[dateKey].leads += leads;
-        dailyDataMap[dateKey].vendas += vendas;
-        dailyDataMap[dateKey].bats += bats;
+        // Atualizar totais do dia
+        dayEntry.leads += leads;
+        dayEntry.vendas += vendas;
+        dayEntry.bats += bats;
         
         // Inicializar ou atualizar dados do vendedor para este dia
-        if (!dailyDataMap[dateKey].sellers[sellerId]) {
-          dailyDataMap[dateKey].sellers[sellerId] = {
+        if (!dayEntry.sellers[sellerId]) {
+          dayEntry.sellers[sellerId] = {
             id: sellerId,
             name: sellerName,
             leads: 0,
@@ -292,24 +355,24 @@ const dashboardService = {
         }
         
         // Atualizar dados do vendedor para este dia
-        dailyDataMap[dateKey].sellers[sellerId].leads += leads;
-        dailyDataMap[dateKey].sellers[sellerId].vendas += vendas;
-        dailyDataMap[dateKey].sellers[sellerId].bats += bats;
+        dayEntry.sellers[sellerId].leads += leads;
+        dayEntry.sellers[sellerId].vendas += vendas;
+        dayEntry.sellers[sellerId].bats += bats;
       });
       
-      // Converter o mapa em array ordenado por data
-      const dailyData = Object.values(dailyDataMap).sort((a, b) => a.date - b.date);
-      
-      // Formatar o array para o formato esperado pelos gráficos
+      // Calcular a taxa de conversão para cada dia e formatar o resultado final
       const chartData = dailyData.map(day => ({
-        date: formatDateKey(day.date),
-        dateFormatted: formatDateBR(day.date),
+        date: day.dateKey,
+        dateFormatted: day.dateFormatted,
         leads: day.leads,
         vendas: day.vendas,
         bats: day.bats,
         taxa: calculateConversionRate(day.leads, day.vendas),
         sellers: Object.values(day.sellers)
       }));
+      
+      console.log(`Timeline finalizada com ${chartData.length} dias.`);
+      console.log(`Datas no gráfico: ${chartData.map(d => d.dateFormatted).join(', ')}`);
       
       return chartData;
       
@@ -320,22 +383,23 @@ const dashboardService = {
   }
 };
 
-// Função para formatar data como YYYY-MM-DD no fuso horário local
+// Função para formatar data como YYYY-MM-DD
 const formatDateKey = (date) => {
-  const localDate = new Date(date);
-  const year = localDate.getFullYear();
-  const month = String(localDate.getMonth() + 1).padStart(2, '0');
-  const day = String(localDate.getDate()).padStart(2, '0');
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
   return `${year}-${month}-${day}`;
 };
 
-// Função utilitária para formatar datas no padrão DD/MM/YYYY
+// Função para formatar datas no padrão DD/MM/YYYY
 const formatDateBR = (date) => {
-  const d = new Date(date);
-  return `${d.getDate().toString().padStart(2, '0')}/${(d.getMonth() + 1).toString().padStart(2, '0')}/${d.getFullYear()}`;
+  const day = String(date.getDate()).padStart(2, '0');
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const year = date.getFullYear();
+  return `${day}/${month}/${year}`;
 };
 
-// Função para calcular taxa de conversão de forma centralizada
+// Função para calcular taxa de conversão
 const calculateConversionRate = (leads, vendas) => {
   return leads > 0 ? parseFloat(((vendas / leads) * 100).toFixed(2)) : 0;
 };
@@ -359,7 +423,7 @@ const getRandomColor = (seed, isChannel = false) => {
     'tel 0800': '#00CD66'
   };
   
-  // Cores predefinidas para vendedores (mais neutras/profissionais)
+  // Cores predefinidas para vendedores
   const sellerColors = [
     '#3366CC', '#DC3912', '#FF9900', '#109618', '#990099',
     '#0099C6', '#DD4477', '#66AA00', '#B82E2E', '#316395',
