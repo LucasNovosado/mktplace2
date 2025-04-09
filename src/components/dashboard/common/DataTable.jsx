@@ -1,6 +1,9 @@
 import React from 'react';
 
-const DataTable = ({ title, columns, data }) => {
+const DataTable = ({ title, columns, data, centered = false }) => {
+  const tableClassName = centered ? "data-table centered-table" : "data-table";
+  const cellClassName = centered ? "centered-cell" : "";
+  
   return (
     <>
       {title && (
@@ -10,11 +13,11 @@ const DataTable = ({ title, columns, data }) => {
       )}
       
       <div className="data-table-wrapper">
-        <table className="data-table">
+        <table className={tableClassName}>
           <thead>
             <tr>
               {columns.map((column, index) => (
-                <th key={index}>{column}</th>
+                <th key={index} className={cellClassName} style={{textAlign: 'center'}}>{column}</th>
               ))}
             </tr>
           </thead>
@@ -22,7 +25,7 @@ const DataTable = ({ title, columns, data }) => {
             {data.map((row, index) => (
               <tr key={index}>
                 {Object.values(row).map((cell, cellIndex) => (
-                  <td key={cellIndex}>{cell}</td>
+                  <td key={cellIndex} className={cellClassName} style={{textAlign: 'center'}}>{cell}</td>
                 ))}
               </tr>
             ))}

@@ -1,0 +1,56 @@
+/* ChartContainer.css */
+.centered-container {
+    text-align: center;
+  }
+  
+  .centered-header {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 1.5rem;
+  }
+  
+  .centered-header .chart-title {
+    position: relative;
+    padding-bottom: 0.5rem;
+    text-align: center;
+  }
+  
+  .centered-header .chart-title:after {
+    content: "";
+    position: absolute;
+    width: 50%;
+    height: 2px;
+    background-color: var(--primary-color);
+    bottom: 0;
+    left: 25%;
+  }
+  
+  /* Estilos para realçar o container do gráfico */
+  .chart-container {
+    background-color: var(--card-background);
+    border-radius: 8px;
+    box-shadow: var(--box-shadow);
+    padding: 1.5rem;
+    height: 400px;
+    margin-bottom: 2rem;
+    border: 1px solid var(--border-color);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+  }
+  
+  .chart-container:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 15px rgba(0, 0, 0, 0.4);
+  }
+  
+  /* Estilo para centralizar a legenda do gráfico */
+  .recharts-default-legend {
+    text-align: center !important;
+    display: flex !important;
+    justify-content: center !important;
+  }
+  
+  /* Centralizar tooltips */
+  .recharts-tooltip-wrapper {
+    margin: 0 auto;
+  }

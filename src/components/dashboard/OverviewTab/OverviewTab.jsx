@@ -5,8 +5,49 @@ import ChartContainer from '../common/ChartContainer';
 import DataTable from '../common/DataTable';
 import BusinessDayAverageCard from '../common/BusinessDayAverageCard';
 import '../common/BusinessDayAverageCard.css';
+import '../common/DataTable.css'; // Importar os novos estilos
+import '../common/ChartContainer.css'; // Importar estilos do ChartContainer
 
 const OverviewTab = ({ filteredData, displayTimelineData, dashboardData }) => {
+  // Calcular dias úteis entre as datas (excluindo domingos)
+  const calcularDiasUteis = (dataInicio, dataFim) => {
+    let diasUteis = 0;
+    let dataAtual = new Date(dataInicio);
+    
+    while (dataAtual <= dataFim) {
+      // 0 = Domingo, 1-6 = Segunda a Sábado
+      if (dataAtual.getDay() !== 0) {
+        diasUteis++;
+      }
+      
+      // Avançar para o próximo dia
+      dataAtual.setDate(dataAtual.getDate() + 1);
+    }
+    
+    return diasUteis > 0 ? diasUteis : 1; // Garantir que não dividimos por zero
+  };
+
+  // Calcular dias úteis no período selecionado
+  const diasUteis = calcularDiasUteis(dashboardData.period.start, dashboardData.period.end);
+
+  // Sort sellers by sales volume in descending order and add rank
+  const rankedSellerData = [...dashboardData.sellerData]
+    .sort((a, b) => b.vendas - a.vendas)
+    .map((seller, index) => {
+      // Calcular média de vendas por dia útil
+      const mediaVendas = seller.vendas / diasUteis;
+      
+      return {
+        rank: index + 1,
+        name: seller.name,
+        vendas: seller.vendas,
+        leads: seller.leads,
+        bats: seller.bats,
+        taxaConversao: `${Math.floor(seller.taxaConversao)}%`, // Remover casas decimais
+        mediaVendas: `${mediaVendas.toFixed(1)} | ${diasUteis}` // Formato: "Média | Dias"
+      };
+    });
+
   return (
     <div className="tab-content">
       {/* Cards de visão geral */}
@@ -18,10 +59,11 @@ const OverviewTab = ({ filteredData, displayTimelineData, dashboardData }) => {
         startDate={dashboardData.period.start}
         endDate={dashboardData.period.end}
         title="Média por Dia Útil (Visão Geral)"
+        centered={true}
       />
       
-      {/* Gráfico de vendas por período */}
-      <ChartContainer title="Vendas e Leads por Período">
+      {/* Gráfico de vendas por período - Vendas antes de Leads */}
+      <ChartContainer title="Vendas e Leads por Período" centered={true}>
         <ResponsiveContainer width="100%" height="100%">
           <LineChart
             data={displayTimelineData}
@@ -37,19 +79,20 @@ const OverviewTab = ({ filteredData, displayTimelineData, dashboardData }) => {
             <YAxis />
             <Tooltip />
             <Legend />
-            <Line 
-              type="monotone" 
-              dataKey="leads" 
-              name="Leads" 
-              stroke="#1976D2" 
-              strokeWidth={2}
-              activeDot={{ r: 8 }}
-            />
+            {/* Vendas agora aparece antes dos Leads */}
             <Line 
               type="monotone" 
               dataKey="vendas" 
               name="Vendas" 
               stroke="#2E7D32" 
+              strokeWidth={2}
+              activeDot={{ r: 8 }}
+            />
+            <Line 
+              type="monotone" 
+              dataKey="leads" 
+              name="Leads" 
+              stroke="#1976D2" 
               strokeWidth={2}
             />
             <Line 
@@ -63,17 +106,12 @@ const OverviewTab = ({ filteredData, displayTimelineData, dashboardData }) => {
         </ResponsiveContainer>
       </ChartContainer>
       
-      {/* Tabela de resumo */}
+      {/* Tabela de resumo com ranking */}
       <DataTable 
-        title="Resumo por Vendedor"
-        columns={['Vendedor', 'Leads', 'Vendas', 'BATS', 'Taxa de Conversão']}
-        data={dashboardData.sellerData.map(seller => ({
-          name: seller.name,
-          leads: seller.leads,
-          vendas: seller.vendas,
-          bats: seller.bats,
-          taxaConversao: `${seller.taxaConversao.toFixed(2)}%`
-        }))}
+        title="Resumo por Vendedor (Ranking por Vendas)"
+        columns={['Posição', 'Vendedor', 'Vendas', 'Leads', 'BATS', 'Taxa de Conversão', 'Média | Dias']}
+        data={rankedSellerData}
+        centered={true}
       />
     </div>
   );

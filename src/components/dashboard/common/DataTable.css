@@ -1,0 +1,100 @@
+/* DataTable.css */
+.centered-table {
+    width: 100%;
+    text-align: center;
+  }
+  
+  .centered-table thead th {
+    text-align: center;
+  }
+  
+  .centered-cell {
+    text-align: center;
+  }
+  
+  /* Estilos para melhorar a aparência dos cabeçalhos centrados */
+  .chart-header {
+    text-align: center;
+    margin-bottom: 1.5rem;
+  }
+  
+  .chart-title {
+    display: inline-block;
+    position: relative;
+    padding-bottom: 0.5rem;
+  }
+  
+  .chart-title:after {
+    content: "";
+    position: absolute;
+    width: 50%;
+    height: 2px;
+    background-color: var(--primary-color);
+    bottom: 0;
+    left: 25%;
+  }
+  
+  /* Estilos para os cards de métricas */
+  .overview-cards {
+    text-align: center;
+  }
+  
+  .overview-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .overview-card-header {
+    justify-content: center;
+  }
+  
+  .overview-card-title, 
+  .overview-card-value {
+    text-align: center;
+  }
+  
+  /* Adicionar margens entre as linhas da tabela para melhor legibilidade */
+  .centered-table tbody tr {
+    transition: background-color 0.3s ease;
+  }
+  
+  .centered-table tbody tr:hover {
+    background-color: rgba(255, 215, 0, 0.1);
+  }
+  
+  /* Adicionar bordas mais suaves */
+  .centered-table th,
+  .centered-table td {
+    padding: 0.75rem 1rem;
+    border-bottom: 1px solid var(--border-color);
+  }
+  
+  /* Destacar os cabeçalhos */
+  .centered-table th {
+    background-color: rgba(255, 215, 0, 0.1);
+    font-weight: 600;
+    color: var(--primary-color);
+    position: relative;
+  }
+  
+  /* Adicionar alinhamento vertical e horizontal perfeitos */
+  .centered-table th,
+  .centered-table td {
+    vertical-align: middle;
+    text-align: center !important;
+  }
+  
+  /* Destacar a primeira coluna (posição) */
+  .centered-table tbody tr td:first-child {
+    font-weight: bold;
+    color: #FFD700; /* Amarelo ouro para posição */
+    text-align: center !important;
+  }
+  
+  /* Destacar a terceira coluna (vendas) */
+  .centered-table tbody tr td:nth-child(3) {
+    font-weight: bold;
+    color: #ffffff; /* Mudado de verde para branco */
+  }
