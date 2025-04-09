@@ -4,7 +4,6 @@ import { BrowserRouter as Router } from 'react-router-dom';
 import Parse from 'parse/dist/parse.min.js';
 import AppRoutes from './routes/AppRoutes';
 import { ThemeProvider } from './contexts/ThemeContext';
-import ThemeToggle from './components/ThemeToggle';
 import './styles/theme.css';
 
 const App = () => {
@@ -23,7 +22,6 @@ const App = () => {
     <ThemeProvider>
       <Router>
         <AppRoutes />
-        <ThemeToggle />
       </Router>
     </ThemeProvider>
   );
