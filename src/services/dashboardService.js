@@ -37,6 +37,81 @@ const isSameDay = (date1, date2) => {
   );
 };
 
+// Função para formatar data como YYYY-MM-DD
+const formatDateKey = (date) => {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+};
+
+// Função para formatar datas no padrão DD/MM/YYYY
+const formatDateBR = (date) => {
+  const day = String(date.getDate()).padStart(2, '0');
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const year = date.getFullYear();
+  return `${day}/${month}/${year}`;
+};
+
+// Função para calcular taxa de conversão
+const calculateConversionRate = (leads, vendas) => {
+  return leads > 0 ? parseFloat(((vendas / leads) * 100).toFixed(2)) : 0;
+};
+
+/**
+ * Calcula a taxa de BATS (porcentagem de vendas BATS sobre o total de vendas)
+ * @param {number} bats - Número de vendas BATS
+ * @param {number} vendas - Número total de vendas
+ * @returns {number} Taxa de BATS em porcentagem
+ */
+const calculateBatsRate = (bats, vendas) => {
+  return vendas > 0 ? parseFloat(((bats / vendas) * 100).toFixed(2)) : 0;
+};
+
+// Função para arredondar para duas casas decimais
+const roundToTwoDecimals = (num) => {
+  return parseFloat(num.toFixed(2));
+};
+
+// Função para gerar cores para os gráficos
+const getRandomColor = (seed, isChannel = false) => {
+  // Cores predefinidas para canais
+  const channelColors = {
+    'instagram': '#E1306C',
+    'facebook': '#4267B2',
+    'google': '#DB4437',
+    'ecommerce': '#6A0DAD',
+    'e-commerce': '#6A0DAD',
+    'apucarana': '#FF8C00',
+    'landing pages': '#0077B5',
+    'tel 0800': '#00CD66'
+  };
+  
+  // Cores predefinidas para vendedores
+  const sellerColors = [
+    '#3366CC', '#DC3912', '#FF9900', '#109618', '#990099',
+    '#0099C6', '#DD4477', '#66AA00', '#B82E2E', '#316395',
+    '#994499', '#22AA99', '#AAAA11', '#6633CC', '#E67300',
+    '#8B0707', '#329262', '#5574A6', '#3B3EAC'
+  ];
+  
+  if (isChannel) {
+    // Para canais, tenta corresponder pelo nome ou retorna uma cor padrão
+    const seedStr = seed.toString().toLowerCase();
+    for (const [name, color] of Object.entries(channelColors)) {
+      if (seedStr.includes(name)) {
+        return color;
+      }
+    }
+    // Fallback para canal desconhecido
+    return '#2196F3';
+  } else {
+    // Para vendedores, usa o índice baseado no seed
+    const seedNum = seed.toString().split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
+    return sellerColors[seedNum % sellerColors.length];
+  }
+};
+
 /**
  * Serviço para processar e fornecer dados para o dashboard
  */
@@ -63,7 +138,7 @@ const dashboardService = {
       query.lessThanOrEqualTo("dateRelease", end);
       query.include("sellerId");
       query.include("channelId");
-      query.limit(1000); // Ajustar conforme necessário
+      query.limit(10000); // Aumentado para 10000
       
       const releases = await query.find();
       console.log(`Encontrados ${releases.length} releases.`);
@@ -101,6 +176,7 @@ const dashboardService = {
             vendas: 0,
             bats: 0,
             taxaConversao: 0,
+            taxaBats: 0,
             channels: {},
             color: getRandomColor(sellerId) // Cor para gráficos
           };
@@ -119,7 +195,8 @@ const dashboardService = {
             leads: 0,
             vendas: 0,
             bats: 0,
-            taxaConversao: 0
+            taxaConversao: 0,
+            taxaBats: 0
           };
         }
         
@@ -137,6 +214,7 @@ const dashboardService = {
             vendas: 0,
             bats: 0,
             taxaConversao: 0,
+            taxaBats: 0,
             color: getRandomColor(channelId, true) // Cor para gráficos
           };
         }
@@ -155,18 +233,22 @@ const dashboardService = {
       // Calcular taxas de conversão
       Object.values(sellerData).forEach(seller => {
         seller.taxaConversao = calculateConversionRate(seller.leads, seller.vendas);
+        seller.taxaBats = calculateBatsRate(seller.bats, seller.vendas);
         
         Object.values(seller.channels).forEach(channel => {
           channel.taxaConversao = calculateConversionRate(channel.leads, channel.vendas);
+          channel.taxaBats = calculateBatsRate(channel.bats, channel.vendas);
         });
       });
       
       Object.values(channelData).forEach(channel => {
         channel.taxaConversao = calculateConversionRate(channel.leads, channel.vendas);
+        channel.taxaBats = calculateBatsRate(channel.bats, channel.vendas);
       });
       
       // Calcular taxa de conversão geral
       const taxaConversaoGeral = calculateConversionRate(totalLeads, totalVendas);
+      const taxaBatsGeral = calculateBatsRate(totalBats, totalVendas);
       
       // Preparar dados para gráficos
       const sellerChartData = Object.values(sellerData).map(seller => ({
@@ -175,6 +257,7 @@ const dashboardService = {
         vendas: seller.vendas,
         bats: seller.bats,
         taxa: roundToTwoDecimals(seller.taxaConversao),
+        taxaBats: roundToTwoDecimals(seller.taxaBats),
         color: seller.color
       }));
       
@@ -184,6 +267,7 @@ const dashboardService = {
         vendas: channel.vendas,
         bats: channel.bats,
         taxa: roundToTwoDecimals(channel.taxaConversao),
+        taxaBats: roundToTwoDecimals(channel.taxaBats),
         color: channel.color
       }));
       
@@ -196,7 +280,8 @@ const dashboardService = {
           leads: totalLeads,
           vendas: totalVendas,
           bats: totalBats,
-          taxaConversao: roundToTwoDecimals(taxaConversaoGeral)
+          taxaConversao: roundToTwoDecimals(taxaConversaoGeral),
+          taxaBats: roundToTwoDecimals(taxaBatsGeral)
         },
         period: {
           start: startDate,
@@ -232,7 +317,7 @@ const dashboardService = {
       query.lessThanOrEqualTo("dateRelease", end);
       query.include("sellerId");
       query.include("channelId");
-      query.limit(1000); // Ajustar conforme necessário
+      query.limit(10000); // Aumentado para 10000
       
       const releases = await query.find();
       console.log(`Encontrados ${releases.length} releases para timeline.`);
@@ -368,6 +453,7 @@ const dashboardService = {
         vendas: day.vendas,
         bats: day.bats,
         taxa: calculateConversionRate(day.leads, day.vendas),
+        taxaBats: calculateBatsRate(day.bats, day.vendas),
         sellers: Object.values(day.sellers)
       }));
       
@@ -380,130 +466,6 @@ const dashboardService = {
       console.error("Erro ao buscar dados diários:", error);
       throw error;
     }
-  }
-};
-
-// Função para formatar data como YYYY-MM-DD
-const formatDateKey = (date) => {
-  const year = date.getFullYear();
-  const month = String(date.getMonth() + 1).padStart(2, '0');
-  const day = String(date.getDate()).padStart(2, '0');
-  return `${year}-${month}-${day}`;
-};
-
-// Função para formatar datas no padrão DD/MM/YYYY
-const formatDateBR = (date) => {
-  const day = String(date.getDate()).padStart(2, '0');
-  const month = String(date.getMonth() + 1).padStart(2, '0');
-  const year = date.getFullYear();
-  return `${day}/${month}/${year}`;
-};
-
-// Função para calcular taxa de conversão
-const calculateConversionRate = (leads, vendas) => {
-  return leads > 0 ? parseFloat(((vendas / leads) * 100).toFixed(2)) : 0;
-};
-
-// Função para arredondar para duas casas decimais
-const roundToTwoDecimals = (num) => {
-  return parseFloat(num.toFixed(2));
-};
-
-// Função para gerar cores para os gráficos
-const getRandomColor = (seed, isChannel = false) => {
-  // Cores predefinidas para canais
-  const channelColors = {
-    'instagram': '#E1306C',
-    'facebook': '#4267B2',
-    'google': '#DB4437',
-    'ecommerce': '#6A0DAD',
-    'e-commerce': '#6A0DAD',
-    'apucarana': '#FF8C00',
-    'landing pages': '#0077B5',
-    'tel 0800': '#00CD66'
-  };
-  
-  // Cores predefinidas para vendedores
-  const sellerColors = [
-    '#3366CC', '#DC3912', '#FF9900', '#109618', '#990099',
-    '#0099C6', '#DD4477', '#66AA00', '#B82E2E', '#316395',
-    '#994499', '#22AA99', '#AAAA11', '#6633CC', '#E67300',
-    '#8B0707', '#329262', '#5574A6', '#3B3EAC'
-  ];
-  
-  if (isChannel) {
-    // Para canais, tenta corresponder pelo nome ou retorna uma cor padrão
-    const seedStr = seed.toString().toLowerCase();
-    for (const [name, color] of Object.entries(channelColors)) {
-      if (seedStr.includes(name)) {
-        return color;
-      }
-    }
-    // Fallback para canal desconhecido
-    return '#2196F3';
-  } else {
-    // Para vendedores, usa o índice baseado no seed
-    const seedNum = seed.toString().split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
-    return sellerColors[seedNum % sellerColors.length];
-  }
-};
-
-// Função que deve ser adicionada ao dashboardService.js
-
-/**
- * Calcula a taxa de BATS (porcentagem de vendas BATS sobre o total de vendas)
- * @param {number} bats - Número de vendas BATS
- * @param {number} vendas - Número total de vendas
- * @returns {number} Taxa de BATS em porcentagem
- */
-const calculateBatsRate = (bats, vendas) => {
-  return vendas > 0 ? parseFloat(((bats / vendas) * 100).toFixed(2)) : 0;
-};
-
-// Modificar a função para calcular taxas de conversão no dashboardService.js
-// Procure por código similar a este:
-
-// Calcular taxas de conversão
-Object.values(sellerData).forEach(seller => {
-  seller.taxaConversao = calculateConversionRate(seller.leads, seller.vendas);
-  
-  // Adicionar taxa de BATS
-  seller.taxaBats = calculateBatsRate(seller.bats, seller.vendas);
-  
-  Object.values(seller.channels).forEach(channel => {
-    channel.taxaConversao = calculateConversionRate(channel.leads, channel.vendas);
-    
-    // Adicionar taxa de BATS para cada canal
-    channel.taxaBats = calculateBatsRate(channel.bats, channel.vendas);
-  });
-});
-
-Object.values(channelData).forEach(channel => {
-  channel.taxaConversao = calculateConversionRate(channel.leads, channel.vendas);
-  
-  // Adicionar taxa de BATS para cada canal global
-  channel.taxaBats = calculateBatsRate(channel.bats, channel.vendas);
-});
-
-// Adicionar taxa de BATS geral
-const taxaBatsGeral = calculateBatsRate(totalBats, totalVendas);
-
-// Na parte onde retorna os dados, adicionar a taxa de BATS:
-return {
-  sellerData: Object.values(sellerData),
-  channelData: Object.values(channelData),
-  sellerChartData,
-  channelChartData,
-  totals: {
-    leads: totalLeads,
-    vendas: totalVendas,
-    bats: totalBats,
-    taxaConversao: roundToTwoDecimals(taxaConversaoGeral),
-    taxaBats: roundToTwoDecimals(taxaBatsGeral) // Adicionar taxa de BATS aos totais
-  },
-  period: {
-    start: startDate,
-    end: endDate
   }
 };
 
