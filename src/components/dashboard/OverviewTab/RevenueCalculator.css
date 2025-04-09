@@ -1,0 +1,141 @@
+/* src/components/dashboard/OverviewTab/RevenueCalculator.css */
+
+.simple-revenue-calculator {
+    margin: 1rem 0;
+    background-color: var(--card-background);
+    border-radius: 8px;
+    padding: 1rem;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+    border: 1px solid var(--border-color);
+  }
+  
+  .simple-revenue-calculator.loading {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: var(--text-muted);
+    font-style: italic;
+    padding: 0.75rem;
+    min-height: 50px;
+  }
+  
+  .revenue-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 1rem;
+  }
+  
+  .revenue-title {
+    font-size: 1rem;
+    color: var(--text-color);
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  
+  .revenue-value {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--primary-color);
+    transition: filter 0.3s ease;
+  }
+  
+  .revenue-value.blurred, 
+  .ticket-label.blurred {
+    filter: blur(4px);
+    user-select: none;
+  }
+  
+  /* Botão de visibilidade (olho) */
+  .visibility-toggle {
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    padding: 0.25rem;
+    color: var(--text-muted);
+    transition: color 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .visibility-toggle:hover {
+    color: var(--primary-color);
+  }
+  
+  /* Controles do Ticket Médio */
+  .ticket-editor {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  
+  .ticket-label {
+    font-size: 0.9rem;
+    color: var(--text-muted);
+    transition: filter 0.3s ease;
+  }
+  
+  .ticket-display {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  
+  .ticket-input-group {
+    display: flex;
+    align-items: center;
+    background-color: rgba(255, 255, 255, 0.05);
+    border-radius: 4px;
+    border: 1px solid var(--border-color);
+    overflow: hidden;
+  }
+  
+  .ticket-input {
+    padding: 0.25rem 0.5rem;
+    border: none;
+    background-color: transparent;
+    color: var(--text-color);
+    font-size: 0.9rem;
+    width: 70px;
+    text-align: right;
+  }
+  
+  .ticket-input:focus {
+    outline: none;
+  }
+  
+  .ticket-button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    padding: 0.25rem;
+    color: var(--text-muted);
+    transition: color 0.2s;
+  }
+  
+  .ticket-button:hover {
+    color: var(--primary-color);
+  }
+  
+  .ticket-button.save:hover {
+    color: #4caf50;
+  }
+  
+  .ticket-button.cancel:hover {
+    color: var(--error-color);
+  }
+  
+  /* Responsividade */
+  @media (max-width: 600px) {
+    .revenue-header {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+  }

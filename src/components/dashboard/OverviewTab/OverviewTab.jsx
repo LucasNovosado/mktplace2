@@ -1,15 +1,23 @@
 import React from 'react';
 import OverviewCards from './OverviewCards';
 import TimelineChart from './TimelineChart';
+import RevenueCalculator from './RevenueCalculator';
 import ChartContainer from '../common/ChartContainer';
 import DataTable from '../common/DataTable';
 import './TimelineChart.css';
+import './RevenueCalculator.css';
 
 const OverviewTab = ({ filteredData, displayTimelineData, dashboardData }) => {
   return (
     <div className="tab-content">
       {/* Cards de visão geral */}
       <OverviewCards totals={filteredData.totals} />
+      
+      {/* Calculadora de faturamento */}
+      <RevenueCalculator 
+        vendas={filteredData.totals.vendas} 
+        bats={filteredData.totals.bats} 
+      />
       
       {/* Gráfico de vendas por período - Usando o componente personalizado */}
       <ChartContainer title="Evolução de Vendas e Leads">

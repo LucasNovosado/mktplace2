@@ -21,12 +21,6 @@ const DashboardTabs = ({ activeTab, setActiveTab }) => {
       >
         Canais
       </button>
-      <button 
-        className={`dashboard-tab ${activeTab === 'cronologia' ? 'active' : ''}`}
-        onClick={() => setActiveTab('cronologia')}
-      >
-        Cronologia
-      </button>
     </div>
   );
 };
