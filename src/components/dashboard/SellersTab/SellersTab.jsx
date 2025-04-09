@@ -4,13 +4,28 @@ import ChartContainer from '../common/ChartContainer';
 import DataTable from '../common/DataTable';
 
 const SellersTab = ({ dashboardData }) => {
+  // Preparar dados para o gráfico com taxa de BATS
+  const sellersChartData = dashboardData.sellerData.map(seller => {
+    // Calcular taxa de BATS se não existir na entrada
+    const taxaBats = seller.taxaBats || (seller.vendas > 0 ? (seller.bats / seller.vendas * 100) : 0);
+    
+    return {
+      name: seller.name,
+      leads: seller.leads,
+      vendas: seller.vendas,
+      bats: seller.bats,
+      taxaConversao: seller.taxaConversao,
+      taxaBats: taxaBats
+    };
+  });
+
   return (
     <div className="tab-content">
       {/* Gráfico de barras - Vendas por vendedor */}
       <ChartContainer title="Desempenho por Vendedor">
         <ResponsiveContainer width="100%" height="100%">
           <BarChart
-            data={dashboardData.sellerChartData}
+            data={sellersChartData}
             margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
           >
             <CartesianGrid strokeDasharray="3 3" />
@@ -25,16 +40,17 @@ const SellersTab = ({ dashboardData }) => {
         </ResponsiveContainer>
       </ChartContainer>
       
-      {/* Tabela detalhada de vendedores */}
+      {/* Tabela detalhada de vendedores - com percentuais arredondados */}
       <DataTable 
         title="Detalhes por Vendedor"
-        columns={['Vendedor', 'Leads', 'Vendas', 'BATS', 'Taxa de Conversão']}
-        data={dashboardData.sellerData.map(seller => ({
+        columns={['Vendedor', 'Leads', 'Vendas', 'BATS', 'Taxa de Conversão', 'Taxa BATS']}
+        data={sellersChartData.map(seller => ({
           name: seller.name,
           leads: seller.leads,
           vendas: seller.vendas,
           bats: seller.bats,
-          taxaConversao: `${seller.taxaConversao.toFixed(2)}%`
+          taxaConversao: `${Math.round(seller.taxaConversao)}%`,
+          taxaBats: `${Math.round(seller.taxaBats)}%`
         }))}
       />
     </div>

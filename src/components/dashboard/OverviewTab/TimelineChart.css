@@ -1,0 +1,81 @@
+/* src/components/dashboard/OverviewTab/TimelineChart.css */
+.custom-tooltip {
+  background-color: rgba(30, 30, 30, 0.9);
+  border: 1px solid rgba(255, 215, 0, 0.5);
+  border-radius: 6px;
+  padding: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  min-width: 180px;
+  backdrop-filter: blur(4px);
+}
+
+.tooltip-date {
+  margin: 0 0 8px 0;
+  padding-bottom: 6px;
+  font-weight: 600;
+  font-size: 14px;
+  color: var(--primary-color);
+  border-bottom: 1px solid rgba(255, 215, 0, 0.3);
+}
+
+.tooltip-items {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.tooltip-item {
+  display: flex;
+  justify-content: space-between;
+  font-size: 13px;
+}
+
+.tooltip-conversion, .tooltip-bats-rate {
+  margin-top: 8px;
+  padding-top: 8px;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  display: flex;
+  justify-content: space-between;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.tooltip-conversion {
+  color: var(--primary-color);
+}
+
+.tooltip-bats-rate {
+  color: #ED6C02; /* Cor laranja para BATS */
+}
+
+.recharts-legend-item-text {
+  color: var(--text-color) !important;
+}
+
+.recharts-reference-line .recharts-text {
+  font-size: 11px;
+}
+
+.recharts-area:hover {
+  opacity: 0.9;
+}
+
+.recharts-tooltip-cursor {
+  opacity: 0.3 !important;
+}
+
+/* Animações */
+@keyframes fadeInChart {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.recharts-responsive-container {
+  animation: fadeInChart 0.8s ease-out forwards;
+}

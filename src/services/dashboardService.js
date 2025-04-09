@@ -448,4 +448,63 @@ const getRandomColor = (seed, isChannel = false) => {
   }
 };
 
+// Função que deve ser adicionada ao dashboardService.js
+
+/**
+ * Calcula a taxa de BATS (porcentagem de vendas BATS sobre o total de vendas)
+ * @param {number} bats - Número de vendas BATS
+ * @param {number} vendas - Número total de vendas
+ * @returns {number} Taxa de BATS em porcentagem
+ */
+const calculateBatsRate = (bats, vendas) => {
+  return vendas > 0 ? parseFloat(((bats / vendas) * 100).toFixed(2)) : 0;
+};
+
+// Modificar a função para calcular taxas de conversão no dashboardService.js
+// Procure por código similar a este:
+
+// Calcular taxas de conversão
+Object.values(sellerData).forEach(seller => {
+  seller.taxaConversao = calculateConversionRate(seller.leads, seller.vendas);
+  
+  // Adicionar taxa de BATS
+  seller.taxaBats = calculateBatsRate(seller.bats, seller.vendas);
+  
+  Object.values(seller.channels).forEach(channel => {
+    channel.taxaConversao = calculateConversionRate(channel.leads, channel.vendas);
+    
+    // Adicionar taxa de BATS para cada canal
+    channel.taxaBats = calculateBatsRate(channel.bats, channel.vendas);
+  });
+});
+
+Object.values(channelData).forEach(channel => {
+  channel.taxaConversao = calculateConversionRate(channel.leads, channel.vendas);
+  
+  // Adicionar taxa de BATS para cada canal global
+  channel.taxaBats = calculateBatsRate(channel.bats, channel.vendas);
+});
+
+// Adicionar taxa de BATS geral
+const taxaBatsGeral = calculateBatsRate(totalBats, totalVendas);
+
+// Na parte onde retorna os dados, adicionar a taxa de BATS:
+return {
+  sellerData: Object.values(sellerData),
+  channelData: Object.values(channelData),
+  sellerChartData,
+  channelChartData,
+  totals: {
+    leads: totalLeads,
+    vendas: totalVendas,
+    bats: totalBats,
+    taxaConversao: roundToTwoDecimals(taxaConversaoGeral),
+    taxaBats: roundToTwoDecimals(taxaBatsGeral) // Adicionar taxa de BATS aos totais
+  },
+  period: {
+    start: startDate,
+    end: endDate
+  }
+};
+
 export default dashboardService;
