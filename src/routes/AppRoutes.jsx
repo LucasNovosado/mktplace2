@@ -3,6 +3,7 @@ import { Routes, Route, Navigate } from 'react-router-dom';
 import LoginPage from '../pages/LoginPage';
 import DashboardPage from '../pages/DashboardPage';
 import ImportacaoPage from '../pages/ImportacaoPage';
+import EditReleasePage from '../pages/EditReleasePage';
 import authService from '../services/authService';
 
 const ProtectedRoute = ({ children }) => {
@@ -61,6 +62,24 @@ const AppRoutes = () => {
         element={
           <ProtectedRoute>
             <ImportacaoPage />
+          </ProtectedRoute>
+        }  
+      />
+      
+      <Route 
+        path="/releases/:id"
+        element={
+          <ProtectedRoute>
+            <EditReleasePage />
+          </ProtectedRoute>
+        }  
+      />
+      
+      <Route 
+        path="/releases/new"
+        element={
+          <ProtectedRoute>
+            <EditReleasePage />
           </ProtectedRoute>
         }  
       />

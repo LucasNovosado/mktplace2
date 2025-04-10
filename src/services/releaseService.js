@@ -30,6 +30,28 @@ const releaseService = {
   },
 
   /**
+   * Obtém um release específico por ID
+   * @param {string} releaseId - ID do release
+   * @returns {Promise<Parse.Object>} Promise resolvida com o objeto Release
+   */
+  getReleaseById: async (releaseId) => {
+    try {
+      const Release = Parse.Object.extend("Releases");
+      const query = new Parse.Query(Release);
+      
+      // Incluir objetos relacionados
+      query.include("sellerId");
+      query.include("channelId");
+      
+      const result = await query.get(releaseId);
+      return result;
+    } catch (error) {
+      console.error(`Erro ao buscar release com ID ${releaseId}:`, error);
+      throw error;
+    }
+  },
+
+  /**
    * Obtém Releases de um período específico
    * @param {Date} startDate - Data inicial
    * @param {Date} endDate - Data final
@@ -118,6 +140,56 @@ const releaseService = {
       return result;
     } catch (error) {
       console.error("Erro ao criar release:", error);
+      throw error;
+    }
+  },
+
+  /**
+   * Atualiza um Release existente
+   * @param {string} releaseId - ID do Release a ser atualizado
+   * @param {Object} releaseData - Novos dados para o Release
+   * @returns {Promise<Parse.Object>} Promise resolvida com o objeto atualizado
+   */
+  updateRelease: async (releaseId, releaseData) => {
+    try {
+      const Release = Parse.Object.extend("Releases");
+      const query = new Parse.Query(Release);
+      const release = await query.get(releaseId);
+      
+      // Atualizar campos básicos
+      if (releaseData.dateRelease) release.set("dateRelease", releaseData.dateRelease);
+      if (releaseData.leads !== undefined) release.set("leads", releaseData.leads);
+      if (releaseData.vendas !== undefined) release.set("vendas", releaseData.vendas);
+      if (releaseData.bats !== undefined) release.set("bats", releaseData.bats);
+      
+      // Atualizar ponteiros para outros objetos
+      if (releaseData.sellerId) release.set("sellerId", releaseData.sellerId);
+      if (releaseData.channelId) release.set("channelId", releaseData.channelId);
+      
+      // Salvar as alterações
+      const result = await release.save();
+      return result;
+    } catch (error) {
+      console.error(`Erro ao atualizar release ${releaseId}:`, error);
+      throw error;
+    }
+  },
+
+  /**
+   * Exclui um Release
+   * @param {string} releaseId - ID do Release a ser excluído
+   * @returns {Promise<boolean>} Promise resolvida com true se excluído com sucesso
+   */
+  deleteRelease: async (releaseId) => {
+    try {
+      const Release = Parse.Object.extend("Releases");
+      const query = new Parse.Query(Release);
+      const release = await query.get(releaseId);
+      
+      await release.destroy();
+      return true;
+    } catch (error) {
+      console.error(`Erro ao excluir release ${releaseId}:`, error);
       throw error;
     }
   },
