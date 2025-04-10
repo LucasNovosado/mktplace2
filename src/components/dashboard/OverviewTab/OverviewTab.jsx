@@ -1,14 +1,31 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import OverviewCards from './OverviewCards';
 import ChartContainer from '../common/ChartContainer';
 import DataTable from '../common/DataTable';
 import BusinessDayAverageCard from '../common/BusinessDayAverageCard';
 import '../common/BusinessDayAverageCard.css';
-import '../common/DataTable.css'; // Importar os novos estilos
-import '../common/ChartContainer.css'; // Importar estilos do ChartContainer
+import RevenueCalculator from './RevenueCalculator';
+import financesService from '../../../services/financesService'; // Você precisará criar este serviço
 
 const OverviewTab = ({ filteredData, displayTimelineData, dashboardData }) => {
+  // Estado para o ticket médio
+  const [ticketMedio, setTicketMedio] = useState(237);
+
+  // Buscar o ticket médio quando o componente montar
+  useEffect(() => {
+    const fetchTicketMedio = async () => {
+      try {
+        const valor = await financesService.getTicketMedio();
+        setTicketMedio(valor);
+      } catch (error) {
+        console.error("Erro ao buscar ticket médio:", error);
+      }
+    };
+
+    fetchTicketMedio();
+  }, []);
+
   // Calcular dias úteis entre as datas (excluindo domingos)
   const calcularDiasUteis = (dataInicio, dataFim) => {
     let diasUteis = 0;
@@ -30,7 +47,7 @@ const OverviewTab = ({ filteredData, displayTimelineData, dashboardData }) => {
   // Calcular dias úteis no período selecionado
   const diasUteis = calcularDiasUteis(dashboardData.period.start, dashboardData.period.end);
 
-  // Sort sellers by sales volume in descending order and add rank
+  // Classificar vendedores por volume de vendas e adicionar rank
   const rankedSellerData = [...dashboardData.sellerData]
     .sort((a, b) => b.vendas - a.vendas)
     .map((seller, index) => {
@@ -61,8 +78,14 @@ const OverviewTab = ({ filteredData, displayTimelineData, dashboardData }) => {
         title="Média por Dia Útil (Visão Geral)"
         centered={true}
       />
+
+      {/* Calculadora de Faturamento */}
+      <RevenueCalculator 
+  vendas={filteredData.totals.vendas}
+  bats={filteredData.totals.bats}
+/>
       
-      {/* Gráfico de vendas por período - Vendas antes de Leads */}
+      {/* Gráfico de vendas por período */}
       <ChartContainer title="Vendas e Leads por Período" centered={true}>
         <ResponsiveContainer width="100%" height="100%">
           <LineChart
@@ -79,7 +102,6 @@ const OverviewTab = ({ filteredData, displayTimelineData, dashboardData }) => {
             <YAxis />
             <Tooltip />
             <Legend />
-            {/* Vendas agora aparece antes dos Leads */}
             <Line 
               type="monotone" 
               dataKey="vendas" 

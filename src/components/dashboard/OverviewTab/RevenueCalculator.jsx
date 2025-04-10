@@ -1,6 +1,7 @@
 // src/components/dashboard/OverviewTab/RevenueCalculator.jsx
 import React, { useState, useEffect } from 'react';
 import financesService from '../../../services/financesService';
+import './RevenueCalculator.css'; // Adicione esta linha
 
 // Valor padrão do ticket médio
 const DEFAULT_TICKET_MEDIO = 237;
